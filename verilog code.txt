@@ -1,0 +1,95 @@
+module main;
+
+reg c1,c2;
+wire d0, d1,r1,y1,f1,r2,y2,g2;
+
+
+
+dinputs inputs( c1,c2,qo,q1,d1,d2);  //this is me calling all the modules back
+traffic_light_1 tf1( c1,c2,qo,q1, r1,y1,g1);
+traffic_light_2 tf2(c1,c2,qo,q1, r2,y2,g2);
+dff1 helpme2 ( d1, clk,  q0);
+dff2 helpme1( d2, clk,  q1);
+
+initial begin 
+#1 c1=1; c2 = 0; 
+#1 c1=1; c2 = 0; 
+#1 c1=1; c2 = 0; 
+#1 c1=1; c2 = 0; 
+#1 c1=0; c2 = 1; 
+#1 c1=0; c2 = 1; 
+#1 c1=0; c2 = 1; 
+#1 c1=0; c2 = 1;
+end
+
+initial #500 $stop;
+initial $monitor ( "%b %b %b %b %b %b %b %b ",c1,c2,r1,y1,g1,r2,y2,g2); // this is me trying to output the lights colours
+
+
+endmodule
+
+
+
+
+module dinputs (input c1,c2,qo,q1,output d1,d2); // this is for the two d inputs 
+wire x1,x2,x3;
+
+and(x1,c1,~c2,~q0,q1);
+and(x2,~c1,c2,q0,q1);
+and(x3,c1,c2,qo,~q1);
+or(d1,x1,x2,x3);
+and(d2,c1,~c2,~q0,~q1);
+endmodule
+
+module traffic_light_1(input c1,c2,qo,q1,output r1,y1,g1); // this is for first traffic light
+wire z1,z2,z3,z4,z5;
+
+and(z1,~c1,c2,~q0);
+and(z2,~c1,c2,q0,~q1);
+or(r1,y1,x1); //first red
+
+and(y1,c1,~c2,~q0,~q1);//first yellow
+
+and(z3,c1,~c2,~q0,q1);
+and(z4,~c1,c2,q0,q1);
+and(z5,c1,~c2,q0,~q1);
+or(g1,z3,z4,z5); //this first traffic light green
+endmodule
+
+
+module traffic_light_2(input c1,c2,qo,q1,output r2,y2,g2);  // this is for second traffic light
+wire h1,h2,h3,h4,h5,h6 ;
+
+and(h1,c1,~c2,~q0,q1);
+and(h2,~c1,c2,q0,q1);
+and(h3,c1,~c2,q0,~q1);
+or(r2,h1,h2,h3); // this red
+
+and(y2,~c1,c2,~q0,~q1); // this yellow
+
+and(h4,~c1,c2,~q0,q1);
+and(h5,c1,~c2,q0,q1);
+and(h6,~c1,c2,q0,~q1);
+or(g2,h4,h5,h6); // this green
+
+endmodule
+
+module dff1(input d1, clk, output q0);// this is the d flip flop for d1
+reg q0;
+initial begin
+q0=0; 
+end
+always @(posedge clk) begin
+q0<=d1;
+end
+endmodule
+
+module dff2(input d2, clk, output q1); // this is the d flip flop for d2
+reg q1;
+initial begin
+q1=0; 
+end
+always @(posedge clk) begin
+q1<=d2;
+end
+endmodule
